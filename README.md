@@ -189,3 +189,28 @@ No matter the syle of architecture of the system, all architectures will provide
 - By abstracting the data store, you free your mind from using a given database engine
 - If the app logic has differnt requrements, consider a NoSQL data store or in-memory solution
 - The data store is not the central piece of the architecture, and it should not dictate the way your system evolves
+
+# Chapter Two - Principles of Good Software Design
+
+The most important principle is keeping things simple! Simplicity isn't about using shortcuts; it's about making what would be easiest for other engineers to use in the future. It's also about being able to comprehend the system as it grows increasingly large and complex. 
+
+## Hiding Complexity and Building Abstraction
+As your system grows, you will not be able to build a mental picture of the entire system as it'll have too many details. Strive for local simplicity! 
+**Local Simplicity** is achieved by ensuring that you can look at any single class, module, or application and quickly understand what its purpose is and how it works. You should only have to comprehend the class at hand to fully understand its behavior. 
+- A good general rule is that no class should dpeend on more than a few other interfaces or classes
+
+## Avoid Over-Engineering 
+Overengineering is building a solution that is much more complex than is really needed. 
+- Ask yourself: Can this be any simpler and still allow flexibility in the future?
+- Ask yourself: What tradeoffs am I making here or Will I really need this later?
+- Engineering is often a game of tradeoffs!
+
+## Try Test-Driven Development
+**TTD** is a set of practices where engineers write tests first and then implement the actual functionality. 
+- The main beenfit is that there is no code w/o unit tests, i.e. no spare code / no unused functionality 
+- Tests can additionally serve as a type of documentation as they can show you how the code was meant to be used anad what the expected behavior was.
+- Froma. cleint persepctive, you must have a much more spartan approach; think about how a user would actually engage with the application, then wirte your tests accordingly
+- When wiritng code, whehther using TTD or not, think about it from the perspective of a client. 
+
+## Loose-Coupling
+**Coupling** is a measure of how much two components know about and depend on one another 
