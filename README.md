@@ -246,3 +246,84 @@ To promote the single responsability principle:
 
 ## Inversion of Control (IOC)
 - Inversion of control is a method of removing responsabilities from a class to make it simpler and less coupled from the rest of the system. 
+- IOC used heavily by some frameworks (Sprint, Rails, etc); instead of you being in control of creating instances of your objects and invoking methods, you become the creator of plugins or extensions to the framework
+- IOC is referred to as "Hollywood principle": subject of IOC is being told "don't call us, we'll call you"
+- IOC is a universal concept. You can create an inversion of control framework for any type of application, and it does not have to be related to MVC or web requests. 
+
+Components of a good IOC framework include the following: 
+- You can create plugins for your framework
+- Each plugin is independent and can be added or removed at any point in time
+- Your framework can auto-detect these plugins or there's a way of configuring whcih plugin should be used and how
+- Your framework defines the interface for each plugin type and is not coupled to plugins themselves
+
+## Desigining for Scale
+
+To make sure you do not overengineer by preparing for scale that you will never need, you should first carefully estimate the most realistic sclability needs of your system and then design accordingly. Only a limited number of startups reach the size where horizontal scalability is needed. 
+
+As you learn more about scalability, you may realize that many of the scalability solutions can be boiled-down to three basic deisgn techniques:
+- Adding more clones (adding indistinguishable components)
+- Functional Partitioning (Dividing the system into smaller subsystems based on functionality)
+- Data partitioning (Keeping a subset of the data on each machine)
+
+### Adding more Clones
+This is the easiest and most common scaling technique. Build the system in a wat that allows you to scale by adding clones.
+A **clone** here is an exact copy of a component or server. Anytime you look at two clones, they must be interchangeable and each of them should be equally qualified to serve an incoming request. In other words, you should be able to send a request to a random clone and get a correct result. 
+
+To scale by adding clones, your goal is to have a set of perfectly interchangeable web servers and distribute the load equally among them all. For this set-up. the load (web requests) is usually distriubted among the clones using a load balancer. Ideally whenever this load balancer recieves a request, it should be able to send it to any of ther serveres w/o needing to know where the previous request went. 
+
+When scaling via clone addition, you need to pay close attention to where you keep the application state and how you propegate state changes among your clones. Scacling via clone addition works best for stateless services as there's no state to synchronize. 
+- If your web servers are stateless, then a new server is exactly the same as a server that is already serving requests. 
+  - In this case, you can increase capacity by simply adding more servers to the load balancer pool
+ 
+ **Stateless Service** is a term used to indicate that a service does not depend on the local state, so processing requests does not addect the way the service behaves. 
+ The main challenge with scaling by adding clones is that it is difficult to scale stateful servers this way, as you need to find ways yo synchronize their state to make them interchangeable.
+ 
+ ### Functional Partitioning 
+ The main thought behind FP us to look for parts of the system focused on a specific functionality and create independent subsystems out of them. In a more advanced form, functional partitioning is dividing a system into self-sufficient applications. It is applied most-often in the web services layer and it is one of the key practives fo service-oriented architecture (SOA). 
+ 
+ Functional partitioning is most often applied on a low level where you break your application down into modules and deploy different types of software to differnt servers (i.e. databases on different servers than web services). In a larger company, it is common to use FP on a higher level of abstraction by creating independent services. In such cases, you can split monolithic application into a set of smaller funcitonal services. 
+ 
+ An additional benefit of FP is that you can have multiple teams working in parallel on independent codebases and gaining more flexibility in scaling each services as differing services have different scalability needs. 
+ 
+ Drawbacks of FP:
+- FPs are independent and usually require more management and effort to start with. 
+- - There is also a limited number of FPs that you can implment, eventually limiting your ability to use this technique
+
+### Data Partitioning
+DP is partitioning the data to keep subsets of it on each machine instead of cloning the entire data set onto each machine. 
+- This is a manifestation fo the share-nothing principle as each server has its own subset of data, which it can control independently.
+- Share-Nothing is an architectural principle where each node is fully autonomous. As a result, each node can make its own decisions about its state w/o need to propegate state changes to peers.
+- Not sharing state means that there is no data synchronization, no need for locking and that failures can be isolated bc nodes do not depend on one another.
+
+Simple Data Partitioning:
+- Each server gets a subset of the data for which it is solely responsible (by having less data on each server, I can process it faster and store more of it in memory)
+- If I need to increase capacity even further, I could add more servers and modify the mapping to redistribute the data
+
+Data partioning, if applied correctly in tandem with adding clones, effecitvely allows for endless scalability. If you partition the data correctly, you can alwayhs add more users, handle more parallel connections, collect more data and deploy your system onto more servers. That said, data partitioning is alwso the most complex and expensive technique. The biggest challenge is that you need to be able to locate the partiion on which the data loves before sending queries to the servers adn that queries spanning multiple partitions may become very inefficient and difficult to implement. 
+
+## Design for Self-Healing
+Designing software for high-availability and self-healing.
+A system is considered to be available as long as it performs its functions as exected from the client's perspective. It does nto matter if the system is experiencing internal partial failure as long as it does not affect the bahavior that clients depend on. In other words, you want to ensure your system appears as if all of its components were functioning perfectly even when things break and during maintenance periods.
+
+A **highly-available** system is a system that is epxected to be available to its clients most of the time. There's no exact measure of high-availability (depends on biz needs). Systems are commonly measured in "number of nines":
+
+A system with two nines is available ~99% of the time, roughly 3.5 days of outage every year (365 * 0.01). A system with five nines would be available 99.999% of the time, i.e. unavailable for five minutes per year.
+
+The main point to remember, is that the larger your system gets, the higher the chance of failure. If you need to contact five webservices and each connects to three data stroes, you are depending on 15 components. If a single one fails, you might become unavailable unless you can handle failure gracefully or fail-over transparently. when designing for high availability, you need to hope for the best but prepare for the worst, always considering what else can fail and in what order. 
+
+Crash-Only Concept
+- CC approach says taht a system should always be ready to crash, and whenever it reboots, it should be able to continue to work w/o human interaction. 
+- This means that the system needs to be able to detect the faulure, fix the broken data if needed-be, and then start work as normal. 
+- Continuously testing differnt failure scnearios is a great way to improve the resilience of your system and promote high availability
+- Inpractice, ensuring high availability is mainly about removing single points of failure and graceful failover.
+
+** Single Point of Failure ** is any piece of infrastructure that is needed for the system to work properly. An example of a single point of failure is can be a DNS server if you only have one. 
+
+A simple way to identify single points of fialure os to draw your data center diagram w/ every single device (routers, servers, switches) and ask yourself what would happen if you shut them down one at a time. Addresss with redundancy
+
+Redundancy is having more than one copy of each piece or each compoennt of the infrastructure. Systems that are not redundant need special attention and it is abest practice to prepare a disaster recovery plan with recovery proceudres for all critical pieces of infrastructure. 
+
+**Self-Healing** is a property going beyond graceful failure handling: it's the ability to detect and fiz problems automatically w/o human intervnention.
+- Holy grail of web operations, but very difficult and expensive to build
+
+
