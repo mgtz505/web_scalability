@@ -213,4 +213,36 @@ Overengineering is building a solution that is much more complex than is really 
 - When wiritng code, whehther using TTD or not, think about it from the perspective of a client. 
 
 ## Loose-Coupling
-**Coupling** is a measure of how much two components know about and depend on one another 
+**Coupling** is a measure of how much two components know about and depend on one another. The higher the coupling, the stronger the dependency. Loose coupling refers to a situation where different components know as little as necessary about each other, whereas no coupling between components means that they are completely unaware of each other's existence.
+
+- Keeping coupling low in your system is important for the health of the system and ability to scale. 
+- High coupling means that changing a single piece of code requires you to inspect in detail multiple parts of the system; higher the coupling, the more unexpected the dependencies and higher chance of introducing bugs into your code.
+- Low coupling promotes keeping complexity localized. Multiple engineers can work on the code base simultaneously. 
+- Promote losse compiling by carefully managing dependecnies amoung classes, modules and applications.
+
+## Practice DRY Code
+- Be cautious with copy + paste code; be cautious with duplication of code.
+
+## Single Responsability Principle
+- Classes should have a single responsability and nothering more
+- Following this principle will result in producing small and simple classes that can be easily refactored and reused. 
+
+To promote the single responsability principle:
+- Keep class length below two to four screens of code
+- Ensure that a class depends on no more than five other interfaces / classes
+- Ensure that a class has a specific goal/purpose
+- Summarize the responsability of the class in a single sentence and put it in a common on top of the class name.
+
+## Open-Closed Principle
+- OC principle is about creating code that does not have to be modified when requirements chance or when new use cases arise. 
+- Open for extenstion and closed for modification. 
+- This option lets us leave more options available and delay decisions about the details; it also reduces the need to change existing code
+
+## Dependency Injection
+- Dependency injection is a simple technique that reduces coupling and promotes the open-closed principle.
+- DI provides references to objects that the class depends on, instead of allowing the class to gather the dependencies itself. 
+- At it's core DI is about knowing as little as possible; it allows classes to not-know how their dependencies are assembled, where they come from or what actual implementations are fulfilling their contracts. 
+- In practice, DI can be summarized as not using the "new" keyword in your classes and demamnding instances of your dependencies to be provided to your class by its clients
+
+## Inversion of Control (IOC)
+- Inversion of control is a method of removing responsabilities from a class to make it simpler and less coupled from the rest of the system. 
