@@ -326,4 +326,47 @@ Redundancy is having more than one copy of each piece or each compoennt of the i
 **Self-Healing** is a property going beyond graceful failure handling: it's the ability to detect and fiz problems automatically w/o human intervnention.
 - Holy grail of web operations, but very difficult and expensive to build
 
+# Chapter 3: Building the Front End Layer
+
+The front end layer spans multiple components. It includes the client (usually a web browser), network components between the client and your data center and parts of your data center that respond directly to clients' connections). 
+The FE componentns will recieve the most traffic; all user interaction, connections and responses must go through the front-end layer in some form or another. This in turn causes the front-end layer to have the highest throughput and concurrency rate demands, making its scalability crucial.
+
+Mist of today's websites are built as tranditional multipage web applications, SPAs or hybrids of these tow approaches,
+
+## Traditional Multipage Web Apps
+- Clicking a link and/or button initiates a new web request and results in the browser reloading an entire page w/ the response recieved from the server. Very simple approach.
+## SPAs
+- These execute the most biz logic in the browser, moreso than hybrid or tranditional applications
+- Primarily built w/ JS with web servers often reduced to providing a data API and a security layer
+- In this model, anytome you performa n action in the UI (say clicking a link or typing text) JS code may initiate asynchronous calls to the server to load/save data
+- The main benefit of SPAs is a richer UI, but users also benefit from a smalelr network footprint and lower latencies between user interactions
+## Hybird Applications
+- Built on blend of SPAs and traditional multipage applciations
+
+## Managing State
+- Carefully managing state is the most important aspect of scaling the front end of your web application
+**Statelessness** is a property of a service, server, or object indicating that it does not hold any data (state)
+- Statelessness makes instances of the same type interchangeable, allowing better scalability
+- In contrast, stateful services keep some "knowledge" between requests, which is not available to every instance of the service
+
+### Managing HTTP Sessions
+Since the HTTP protocol is stateless itself, web applications developed techniques to create a concept of a session on top of HTTP so that servers could recognize multiple requests from the same user as parts of a more complex and longer lasting sequence (the user session)
+
+From a technical POV, sessions are implemented using cookies. 
+1. When a user sends a request to the web server w/o a session cookie, the server can decided to start a new session by sending a response w/ a new session cookie header
+2. The HTTP contract says that all cookies that are still active need to be included in all consecutive calls
+3. By using cookies the server can now recognize which requests are part of the same sequence of events
+
+Even if multiple browsers connected to the web server from the same IP address, cookies allow the web server to figure out whoch requests belong to a particular user, This in turn allows for implementation of user login functionality and other similar features,
+
+When you login to a website, a web application would usually store your user identifier and additional data in the web sesison scope. The web framewoek or the application container toulf then be responsbile for storing the web session scope "somewhere" so that the data stores in the web session scope would be available to the web applicaiton on each HTTP request. 
+
+The key point to overse is that any data you put into the session should be stored outside of the web server itself to be available from any web server.  There are three common wats to solve this problem:
+- Store session state in cookies
+- Delegate the session storage to an external data store
+- Use a load balancer that support sticky sessions
+
+If you decide to store session, situation is fairly simple. In the application, use session scope as normal, then before sending a response to the client, the framework serializes the session data, encrypts it, and includes it in the response headers as a new value of the session data cookie. Main advantage of this approach is that session state is not stored anywhere in your data center.
+
+The practical challenge with using cookies for session storage is that session storage becomes expensive. Cookies are sent by the browser w/ every single request, regardless of the typoe of resource being requested
 
